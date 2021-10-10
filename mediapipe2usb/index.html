@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+  <script src="./js/app.js"></script>
+</head>
+
+<body>
+<div>
+    <h2 align='left' style='color:blue'>手勢控制四足獸 </h2>
+</div>
+  <button id="connect-to-serial">選擇連結的序列埠</button>
+  <label>需開啟 chrome://flags/#enable-experimental-web-platform-features</label>
+  <div class="container">
+    <video class="input_video"></video>
+    <canvas class="output_canvas" width="480px" height="240px"></canvas>
+  </div>
+</body>
+    <div class="col-sm-6">
+      <br>
+      <h4 id='state'></h4>
+      <div id='hint'></div>
+      <h4>Log:</h4>
+      <pre id='log'></pre>
+    </div>
+</html>
+
+<script type="module">
+    const serialLEDController = new SerialLEDController();
+    const connect = document.getElementById('connect-to-serial');
+ 
+    connect.addEventListener('pointerdown', () => {
+      serialLEDController.init();
+    });
+
+
+const videoElement = document.getElementsByClassName('input_video')[0];
+const canvasElement = document.getElementsByClassName('output_canvas')[0];
+const canvasCtx = canvasElement.getContext('2d');
+document.querySelector('#log').textContent = 'test\n';
+function onResults(results) {
+var thumbIsOpen,indexIsOpen,middelIsOpen,ringIsOpen,pinkyIsOpen,pseudoFixKeyPoint;canvasCtx.save(),""!=results.rightHandLandmarks&&void 0!==results.rightHandLandmarks&&10<results.rightHandLandmarks.length&&.2<results.rightHandLandmarks[0].y-results.rightHandLandmarks[9].y&&(pinkyIsOpen=ringIsOpen=middelIsOpen=indexIsOpen=thumbIsOpen=!1,pseudoFixKeyPoint=results.rightHandLandmarks[2].x,results.rightHandLandmarks[3].x>pseudoFixKeyPoint&&results.rightHandLandmarks[4].x>pseudoFixKeyPoint&&(thumbIsOpen=!0),pseudoFixKeyPoint=results.rightHandLandmarks[6].y,results.rightHandLandmarks[7].y<pseudoFixKeyPoint&&results.rightHandLandmarks[8].y<pseudoFixKeyPoint&&(indexIsOpen=!0),pseudoFixKeyPoint=results.rightHandLandmarks[10].y,results.rightHandLandmarks[11].y<pseudoFixKeyPoint&&results.rightHandLandmarks[12].y<pseudoFixKeyPoint&&(middelIsOpen=!0),pseudoFixKeyPoint=results.rightHandLandmarks[14].y,results.rightHandLandmarks[15].y<pseudoFixKeyPoint&&results.rightHandLandmarks[16].y<pseudoFixKeyPoint&&(ringIsOpen=!0),pseudoFixKeyPoint=results.rightHandLandmarks[18].y,results.rightHandLandmarks[19].y<pseudoFixKeyPoint&&results.rightHandLandmarks[20].y<pseudoFixKeyPoint&&(pinkyIsOpen=!0),thumbIsOpen&&indexIsOpen&&middelIsOpen&&ringIsOpen&&pinkyIsOpen?document.querySelector("#log").textContent="five\n":!thumbIsOpen&&indexIsOpen&&middelIsOpen&&ringIsOpen&&pinkyIsOpen?document.querySelector("#log").textContent="four\n":!thumbIsOpen&&indexIsOpen&&middelIsOpen&&ringIsOpen&&!pinkyIsOpen?document.querySelector("#log").textContent="three\n":thumbIsOpen||!indexIsOpen||!middelIsOpen||ringIsOpen||pinkyIsOpen?thumbIsOpen||!indexIsOpen||middelIsOpen||ringIsOpen||pinkyIsOpen?(document.querySelector("#log").textContent=thumbIsOpen||indexIsOpen||middelIsOpen||ringIsOpen||pinkyIsOpen?"error\n":"fist\n",serialLEDController.write("3#")):(document.querySelector("#log").textContent="one\n",serialLEDController.write("1#")):(document.querySelector("#log").textContent="two\n",serialLEDController.write("2#"))),canvasCtx.clearRect(0,0,canvasElement.width,canvasElement.height),canvasCtx.drawImage(results.image,0,0,canvasElement.width,canvasElement.height),drawConnectors(canvasCtx,results.rightHandLandmarks,HAND_CONNECTIONS,{color:"#00CC00",lineWidth:5}),drawLandmarks(canvasCtx,results.rightHandLandmarks,{color:"#FF0000",lineWidth:2}),canvasCtx.restore();}
+
+const holistic = new Holistic({locateFile: (file) => {
+  return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
+}});
+holistic.setOptions({
+  modelComplexity: 1,
+  smoothLandmarks: true,
+  minDetectionConfidence: 0.5,
+  minTrackingConfidence: 0.5
+});
+holistic.onResults(onResults);
+
+const camera = new Camera(videoElement, {
+  onFrame: async () => {
+    await holistic.send({image: videoElement});
+  },
+  width: 480,
+  height: 240
+});
+camera.start();
+</script>
