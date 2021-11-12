@@ -150,56 +150,7 @@ class LineBreakTransformer {
   }
 }
 
-async function getReader() {
-  const filters = [
-       { usbVendorId: 0x2341, usbProductId: 0x0043 },
-       { usbVendorId: 0x067B}
-   ];
-    port = await navigator.serial.requestPort({filters});
-    await port.open({ baudRate: 115200 });
-    connectButton.innerText = 'Disconnect';
-    console.log('Test MPU6050 !!');
-		
-    const textDecoder = new TextDecoderStream();
-    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-    const reader = textDecoder.readable
-       .pipeThrough(new TransformStream(new LineBreakTransformer()))
-       .getReader();
-  
-// Listen to data coming from the serial device.
-while (port.readable) {
-  //const reader = port.readable.getReader();
-  try {
-     while (true) {
-        const { value, done } = await reader.read();
-      if (done) {
-         reader.releaseLock();
-         break;
-      }
-
-      if (value.includes('{') && value.includes('}')) {
-         let buffer = value; 
-           // console.log(buffer);
-           const start = buffer.indexOf('{');
-           const end = buffer.indexOf('}');
-           buffer = buffer.slice(start, end + 1);
-           try {
-               const { ax,ay,az,gx,gy,gz,y,p,r,y2,p2,r2 } = JSON.parse(buffer);
-               modelViewerTransform1.orientation = `${-ax}deg ${-ay}deg ${az}deg`;
-               modelViewerTransform2.orientation = `${-gx}deg ${-gy}deg ${gz}deg`;
-               modelViewerTransform3.orientation = `${-r}deg ${-p}deg ${y}deg`;
-               modelViewerTransform4.orientation = `${-r2}deg ${-p2}deg ${y2}deg`;
-            } catch (err) {
-              console.log(err);
-            }
-            buffer = '';
-        }
-      }
-    } catch (error) {
-    // 
-    }
-   } 
- }
+async function getReader(){const e=[{usbVendorId:9025,usbProductId:67},{usbVendorId:1659}];port=await navigator.serial.requestPort({filters:e}),await port.open({baudRate:115200}),connectButton.innerText="Disconnect",console.log("Test MPU6050 !!");const r=new TextDecoderStream,o=port.readable.pipeTo(r.writable),a=r.readable.pipeThrough(new TransformStream(new LineBreakTransformer)).getReader();for(;port.readable;)try{for(;;){const{value:e,done:r}=await a.read();if(r){a.releaseLock();break}if(e.includes("{")&&e.includes("}")){let r=e;const o=r.indexOf("{"),a=r.indexOf("}");r=r.slice(o,a+1);try{const{ax:e,ay:o,az:a,gx:n,gy:t,gz:d,y:i,p:s,r:c,y2:g,p2:l,r2:f}=JSON.parse(r);modelViewerTransform1.orientation=`${-e}deg ${-o}deg ${a}deg`,modelViewerTransform2.orientation=`${-n}deg ${-t}deg ${d}deg`,modelViewerTransform3.orientation=`${-c}deg ${-s}deg ${i}deg`,modelViewerTransform4.orientation=`${-f}deg ${-l}deg ${g}deg`}catch(e){console.log(e)}r=""}}}catch(e){}}
 	  
 const modelViewerTransform1 = document.querySelector("model-viewer#transform1");
 const modelViewerTransform2 = document.querySelector("model-viewer#transform2");
