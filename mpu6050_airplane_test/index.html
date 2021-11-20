@@ -102,7 +102,7 @@ class LineBreakTransformer {
   }
 }
 
-async function getReader(){const e=[{usbVendorId:9025,usbProductId:67},{usbVendorId:1659}];port=await navigator.serial.requestPort({filters:e}),await port.open({baudRate:115200}),connectButton.innerText="Disconnect",console.log("[31mConnected using Web Serial API ![m\r\n");const r=new TextDecoderStream,n=port.readable.pipeTo(r.writable),o=r.readable.pipeThrough(new TransformStream(new LineBreakTransformer)).getReader();for(;port.readable;)try{for(;;){const{value:e,done:r}=await o.read();if(r){o.releaseLock();break}if(e.includes("{")&&e.includes("}")){let r=e;const n=r.indexOf("{"),o=r.indexOf("}");r=r.slice(n,o+1);try{const{y:e,p:n,r:o}=JSON.parse(r);modelViewerTransform.orientation=`${n}deg ${-o}deg ${e-90}deg`}catch(e){console.log(e)}r=""}}}catch(e){}}
+async function getReader(){const e=[{usbVendorId:9025,usbProductId:67},{usbVendorId:1659}];port=await navigator.serial.requestPort({}),await port.open({baudRate:115200}),connectButton.innerText="Disconnect",console.log("[31mConnected using Web Serial API ![m\r\n");const r=new TextDecoderStream,n=port.readable.pipeTo(r.writable),o=r.readable.pipeThrough(new TransformStream(new LineBreakTransformer)).getReader();for(;port.readable;)try{for(;;){const{value:e,done:r}=await o.read();if(r){o.releaseLock();break}if(e.includes("{")&&e.includes("}")){let r=e;const n=r.indexOf("{"),o=r.indexOf("}");r=r.slice(n,o+1);try{const{y:e,p:n,r:o}=JSON.parse(r);modelViewerTransform.orientation=`${n}deg ${-o}deg ${e-90}deg`}catch(e){console.log(e)}r=""}}}catch(e){}}
   
  //   const myArr = str.split(" ", 2);
 //document.getElementById("demo").innerHTML = myArr[1];
